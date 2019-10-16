@@ -1,0 +1,33 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <span class="navbar-brand">LoP <small>&iquest;Quién es responsable hoy?</small></span>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+        </ul>
+        
+        <span class="navbar-text mr-2"
+            *ngIf="lop.isAutenticated()"             
+            >
+            {{ lop.user.name }}
+        </span>
+        <button 
+            (click)="lop.login()"
+            *ngIf="!lop.isAutenticated()" 
+            class="btn btn-primary" 
+            type="button"
+            >
+            Ingresar
+        </button>        
+        <button
+            (click)="lop.logout()"
+            *ngIf="lop.isAutenticated()" 
+            class="btn btn-danger" 
+            type="button"
+            >
+            Salir
+        </button>
+    </div>
+</nav>
