@@ -126,7 +126,23 @@ export class LopService {
     return this.listsCollection.doc( list.uid ).set( list );
   } 
 
+  removeMember ( list: ListLop ) {
+
+    for(var i = list.members.length; i--;) {
+      if(list.members[i].uid === this.user.uid) {
+        list.members.splice(i, 1);
+        break;
+      }
+    }
+
+    return this.listsCollection.doc( list.uid ).set( list );
+  } 
+
   updateList ( list: ListLop ) {
     return this.listsCollection.doc( list.uid ).set( list );
+  } 
+
+  removeList ( list: ListLop ) {
+    return this.listsCollection.doc( list.uid ).delete();
   } 
 }

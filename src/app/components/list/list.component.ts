@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { LopService } from '../../providers/lop.service';
-import { ActivatedRoute, UrlHandlingStrategy } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ListLop } from '../../interfaces/listLop';
 import { SelectionLop } from '../../interfaces/selectionLop';
 import { UserLop } from '../../interfaces/userLop';
-import { timestamp } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-list',
@@ -15,39 +15,42 @@ export class ListComponent implements OnInit {
   list: ListLop;
   selectionOpen: boolean = true;
   selection: SelectionLop;
+  loading: boolean = true;
 
   constructor( private lop: LopService,
-               private activatedRoute: ActivatedRoute
+               private activatedRoute: ActivatedRoute,
+               private router: Router
     ) {
-    
+    this.loading = true;
+
     this.activatedRoute.params.subscribe( params => {
       
       this.lop.getList( params['uid'] ).subscribe( resp => {
+        
+        if (!resp) return; // Para evitar errores cuando se elimina la lista estando aún en list
+        
         let today0 = this.day0hr (new Date());
         this.list = resp;
 
         this.selection = { 
-          selectionDay: today0,
+          selectionDay: 0,
           uidUserSelected: ''
         }
 
         this.list.members.forEach( member => {
           
-          if (member.lastDateSelected === this.selection.selectionDay) {
+          if (member.lastDateSelected === today0) {
             this.selectionOpen = false;
-            return;
           }
 
           if (this.lop.user.uid === member.uid) {
 
-            let dateTmp = this.day0hr(new Date(member.selection.selectionDay));
-
-            if ( dateTmp === this.selection.selectionDay ) {
+            if ( member.selection.selectionDay === today0 ) {
               this.selection = member.selection;
             }
             else {
               this.selection = {
-                selectionDay: this.selection.selectionDay,
+                selectionDay: today0,
                 uidUserSelected: ''
               }
             }
@@ -55,7 +58,12 @@ export class ListComponent implements OnInit {
 
         });
 
+        if (this.selection.selectionDay<=0) {
+          this.router.navigate(['lists']);
+        }
+        this.loading = false;
       });
+    
     });
 
   }
@@ -110,4 +118,39 @@ export class ListComponent implements OnInit {
         
     this.lop.updateList ( this.list );    
   }
+
+  async desuscribir () {
+
+    Swal.fire({
+      title: 'Está Seguro?',
+      text: "Si se desuscribe perderá toda su historia en esta actividad",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#007bff',
+      cancelButtonColor: '#dc3545',
+      confirmButtonText: 'Si, desuscribirme',
+      cancelButtonText: 'No'
+    }).then((result) => {
+      if (result.value) {
+
+        this.lop.removeMember( this.list ).then (() => {
+          Swal.fire({
+            title: this.lop.user.name,
+            text: 'Se desuscribió de ' + this.list.name,
+            type: 'success',
+            confirmButtonColor: '#007bff'  
+          }).then ( () => {
+            if ( this.list.members.length <= 0 ) {
+              this.lop.removeList( this.list ).then( () => {
+                this.router.navigate(['lists']);                
+              })
+            }
+          })
+        })
+      }
+    })
+
+  }
+
+
 }

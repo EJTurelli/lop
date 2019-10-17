@@ -52,6 +52,8 @@ export class ListsComponent implements OnInit {
       input: 'text',
       inputValue: '',
       showCancelButton: true,
+      confirmButtonColor: '#007bff',
+      cancelButtonColor: '#dc3545',
       inputValidator: (value) => {
         if (!value) {
           return 'Necesitas escribir algo!'
@@ -75,6 +77,8 @@ export class ListsComponent implements OnInit {
             title: name,
             text: 'Se creó correctamente',
             type: 'success',
+            confirmButtonColor: '#007bff',
+            cancelButtonColor: '#dc3545',      
           }).then( resp => {
             this.lop.getLists();
           })

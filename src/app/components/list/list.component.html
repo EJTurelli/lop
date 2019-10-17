@@ -1,38 +1,62 @@
-<div class="row">
-    <div class="col text-center">
-        <button 
-            [routerLink]="'/lists'"
-            class="btn btn-primary">
-            Volver al Listado de Actividades
-        </button>
-    </div>
+
+<div *ngIf="loading" 
+    class="alert alert-info text-center mt-3 animated fadeIn faster" role="alert">
+    <h4 class="alert-heading">Cargando...</h4>
+    <p>
+        <i class="fa fa-sync-alt fa-spin fa-2x"></i>
+    </p>
+    <p class="mb-0">
+        Espere por favor    
+    </p>
 </div>
 
-<h3 class="mt-3" *ngIf="list"> {{ list.name }} </h3>
-<div *ngIf="list">
-    <div  class="card mb-3" style="max-width: 100%;" *ngFor="let member of list.members | orden">
-        <div class="row no-gutters">
-            <div class="col-md-2">
-                <img [src]="member.urlPhoto" class="card-img" [alt]="member.name">
-            </div>
-            <div class="col-md-10">
-                <div class="card-body">
-                    <h5 class="card-title"> {{ member.name }}</h5>
-                    <p class="card-text"><small class="text-muted">Última vez: {{ member.lastDateSelected?(member.lastDateSelected | date:'dd/MM/yyyy' ):"Nunca" }}</small></p>
-
-                    <button *ngIf="selectionOpen && (member.uid !== selection.uidUserSelected)" 
-                        (click)="seleccionar(member)"
-                        class="btn btn-success my-2 my-sm-0" >
-                        <i class="fa fa-check"></i> Seleccionar
-                    </button>
-                    <button *ngIf="selectionOpen && (member.uid === selection.uidUserSelected)"
-                        (click)="deseleccionar()"
-                        class="btn btn-danger my-2 my-sm-0" >
-                        <i class="fa fa-times-circle"></i> Deseleccionar
-                    </button>
-
+<div *ngIf="!loading" class="animated fadeIn faster">
+    <div class="row">
+        <div class="col-md-6 text-center mt-2">
+            <button 
+                [routerLink]="'/lists'"
+                class="btn btn-primary">
+                <i class="fa fa-undo-alt"></i>
+                Volver
+            </button>
+        </div>
+        <div class="col-md-6 text-center mt-2">
+            <button 
+                (click)="desuscribir()"
+                class="btn btn-outline-danger">
+                <i class="fa fa-user-times"></i>
+                Desuscribir
+            </button>
+        </div>
+    </div>
+    
+    <h3 class="mt-3" *ngIf="list"> {{ list.name }} </h3>
+    <div *ngIf="list">
+        <div  class="card mb-3" style="max-width: 100%;" *ngFor="let member of list.members | orden">
+            <div class="row no-gutters">
+                <div class="col-md-2">
+                    <img [src]="member.urlPhoto" class="card-img" [alt]="member.name">
+                </div>
+                <div class="col-md-10">
+                    <div class="card-body">
+                        <h5 class="card-title"> {{ member.name }}</h5>
+                        <p class="card-text"><small class="text-muted">Última vez: {{ member.lastDateSelected?(member.lastDateSelected | date:'dd/MM/yyyy' ):"Nunca" }}</small></p>
+    
+                        <button *ngIf="selectionOpen && (member.uid !== selection.uidUserSelected)" 
+                            (click)="seleccionar(member)"
+                            class="btn btn-success my-2 my-sm-0" >
+                            <i class="fa fa-check"></i> Seleccionar
+                        </button>
+                        <button *ngIf="selectionOpen && (member.uid === selection.uidUserSelected)"
+                            (click)="deseleccionar()"
+                            class="btn btn-danger my-2 my-sm-0" >
+                            <i class="fa fa-times-circle"></i> Deseleccionar
+                        </button>
+    
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+            
 </div>
