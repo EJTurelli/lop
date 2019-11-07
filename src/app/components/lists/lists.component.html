@@ -10,7 +10,7 @@
 </div>
 
 <div *ngIf="!loading" class="animated fadeIn faster">
-    <div class="row">
+    <div class="row mb-3">
         <div class="col text-center">
             <button 
                 (click)="newList()"
@@ -20,25 +20,25 @@
             </button>
         </div>
     </div>
-    
-    <div class="card-columns mt-3">
+
+    <div class="card-columns">
         <div class="card bg-success text-white" *ngFor="let lista of misListas">
             <div class="card-body" (click)="entrar( lista )" style="cursor: pointer;">
                 <h5 class="card-title"> {{ lista.name }} </h5>
                 <div class="card-text">
-                    <small>{{ lista.members.length }} {{ lista.members.length==1?'miembro':'miembros' }} tiene esta actividad</small>
+                    <small>{{ lista.members.length }} {{ lista.members.length==1?'participante':'participantes' }} tiene esta actividad</small>
                 </div>
             </div>
         </div>
     </div>
     
     
-    <div class="card-columns mt-3">
+    <div class="card-columns">
         <div class="card" *ngFor="let lista of otrasListas">
             <div class="card-body">
                 <h5 class="card-title"> {{ lista.name }} </h5>
                 <div class="card-text">
-                    <small>{{ lista.members.length }} {{ lista.members.length==1?'miembro':'miembros' }} tiene esta actividad</small>
+                    <small>{{ lista.members.length }} {{ lista.members.length==1?'participante':'participantes' }} tiene esta actividad</small>
                     <div>
                         <button (click)="subscribir( lista )"
                             class="btn btn-primary">
@@ -50,7 +50,6 @@
             </div>
         </div>
     </div>    
-    
-        
+
 </div>
 

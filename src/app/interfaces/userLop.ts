@@ -5,5 +5,7 @@ export interface UserLop {
     name: string;
     urlPhoto: string;
     lastDateSelected: number;
+    admin: boolean;
+    member: boolean;
     selection: SelectionLop;
 }

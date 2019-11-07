@@ -15,7 +15,10 @@ export class ListComponent implements OnInit {
   list: ListLop;
   selectionOpen: boolean = true;
   selection: SelectionLop;
+  iAmAdmin: boolean = false;
+  iAmMember: boolean = false;
   loading: boolean = true;
+  error: string;
 
   constructor( private lop: LopService,
                private activatedRoute: ActivatedRoute,
@@ -26,7 +29,7 @@ export class ListComponent implements OnInit {
     this.activatedRoute.params.subscribe( params => {
       
       this.lop.getList( params['uid'] ).subscribe( resp => {
-        
+
         if (!resp) return; // Para evitar errores cuando se elimina la lista estando aún en list
         
         let today0 = this.day0hr (new Date());
@@ -45,6 +48,9 @@ export class ListComponent implements OnInit {
 
           if (this.lop.user.uid === member.uid) {
 
+            this.iAmAdmin = member.admin;
+            this.iAmMember =  member.member;
+
             if ( member.selection.selectionDay === today0 ) {
               this.selection = member.selection;
             }
@@ -62,6 +68,7 @@ export class ListComponent implements OnInit {
           this.router.navigate(['lists']);
         }
         this.loading = false;
+
       });
     
     });
@@ -119,6 +126,14 @@ export class ListComponent implements OnInit {
     this.lop.updateList ( this.list );    
   }
 
+  makeAdmin ( member: UserLop ) {
+    this.lop.makeAdmin ( this.list , member);
+  }
+
+  aceptar ( member: UserLop ) {
+    this.lop.aceptMember ( this.list , member);
+  }
+
   async desuscribir () {
 
     Swal.fire({
@@ -133,19 +148,33 @@ export class ListComponent implements OnInit {
     }).then((result) => {
       if (result.value) {
 
-        this.lop.removeMember( this.list ).then (() => {
-          Swal.fire({
-            title: this.lop.user.name,
-            text: 'Se desuscribió de ' + this.list.name,
-            type: 'success',
-            confirmButtonColor: '#007bff'  
-          }).then ( () => {
-            if ( this.list.members.length <= 0 ) {
-              this.lop.removeList( this.list ).then( () => {
-                this.router.navigate(['lists']);                
-              })
-            }
-          })
+        this.lop.removeMember( this.list ).then ((result) => {
+          
+          if (typeof result === "string") {
+
+            this.error = result;
+            
+            Swal.fire({
+              title: this.lop.user.name,
+              text: this.error,
+              type: 'error',
+              confirmButtonColor: '#007bff'  
+            })
+          }
+          else {
+            Swal.fire({
+              title: this.lop.user.name,
+              text: 'Se desuscribió de ' + this.list.name,
+              type: 'success',
+              confirmButtonColor: '#007bff'  
+            }).then ( () => {
+              if ( this.list.members.length <= 0 ) {
+                this.lop.removeList( this.list ).then( () => {
+                  this.router.navigate(['lists']);                
+                })
+              }
+            })
+          }
         })
       }
     })

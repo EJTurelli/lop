@@ -91,6 +91,7 @@ export class ListsComponent implements OnInit {
 
   }
 
+
   subscribir ( list: ListLop ) {
     this.lop.addMember ( list );
   }

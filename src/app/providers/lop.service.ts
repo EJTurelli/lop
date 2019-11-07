@@ -16,6 +16,7 @@ export class LopService {
   
   user: UserLop;
   lists: ListLop[] = [];
+  base: string = 'lists';
   
   constructor( public afAuth: AngularFireAuth,
                private router: Router,
@@ -57,6 +58,8 @@ export class LopService {
       uid: user.uid,
       urlPhoto: user.photoURL,
       lastDateSelected: 0,
+      admin: false,
+      member: false,
       selection: { selectionDay: 0, uidUserSelected: '' }
     }
 
@@ -77,9 +80,8 @@ export class LopService {
   
 
   getLists() {
-    this.listsCollection = this.afs.collection<ListLop>('lists');
+    this.listsCollection = this.afs.collection<ListLop>(this.base);
 
-    
     return this.listsCollection.valueChanges().pipe(
       map( (listas: ListLop[]) => {
         this.lists = listas;
@@ -89,7 +91,7 @@ export class LopService {
 
 
   getList( uid: string ) {
-    this.listsCollection = this.afs.collection<ListLop>('lists');
+    this.listsCollection = this.afs.collection<ListLop>(this.base);
 
     return this.listsCollection.doc( uid ).valueChanges().pipe( 
       map( (lista: ListLop) => {
@@ -101,8 +103,14 @@ export class LopService {
 
   newList ( name: string ) {
     let members: UserLop[] = [];
+    let admin: UserLop;
+    
+    admin = Object.assign ({}, this.user);
 
-    members.push ( this.user );
+    admin.admin =  true;
+    admin.member = true;
+    
+    members.push ( admin );
 
     const id = this.afs.createId();
 
@@ -111,6 +119,9 @@ export class LopService {
       uid: id, 
       members: members
     };
+
+    console.log(this.user);
+    
 
     return this.listsCollection.doc( id ).set( list );
   }
@@ -127,9 +138,23 @@ export class LopService {
   } 
 
   removeMember ( list: ListLop ) {
+    let count: number = 0;
+    
+    for(var i = list.members.length; i--;) {
+      if( list.members[i].admin ) {
+        count = count + 1;
+      }
+    }
 
     for(var i = list.members.length; i--;) {
       if(list.members[i].uid === this.user.uid) {
+        
+        if (list.members[i].admin && count <= 1 && list.members.length>1) {
+          return new Promise((resolve: any) => {
+            resolve('No puede Desuscribise por ser el único Administrador');
+          });
+        }
+
         list.members.splice(i, 1);
         break;
       }
@@ -145,4 +170,29 @@ export class LopService {
   removeList ( list: ListLop ) {
     return this.listsCollection.doc( list.uid ).delete();
   } 
+
+  aceptMember ( list: ListLop, member: UserLop ) {
+
+    for(var i = list.members.length; i--;) {
+      if(list.members[i].uid === member.uid) {
+        list.members[i].member = true;
+        break;
+      }
+    }
+
+    return this.listsCollection.doc( list.uid ).set( list );    
+  }
+
+  makeAdmin ( list: ListLop, member: UserLop ) {
+
+    for(var i = list.members.length; i--;) {
+      if(list.members[i].uid === member.uid) {
+        list.members[i].admin = true;
+        break;
+      }
+    }
+
+    return this.listsCollection.doc( list.uid ).set( list );    
+  }
+
 }
