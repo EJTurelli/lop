@@ -100,8 +100,8 @@ export class ListComponent implements OnInit {
 
     this.selection.uidUserSelected = selected.uid;
 
-    // Si más del 50% de los miembros seleccionan a un miembro, automaticamente queda definido como el seleccionado 
-    if (cuenta>this.list.members.length/2) {
+    // Si más o igual que el 50% de los miembros seleccionan a un miembro, automaticamente queda definido como el seleccionado 
+    if (cuenta>=this.list.members.length/2) {
       this.list.members.forEach ( member => {
         if ( member.uid === selected.uid ) {
           member.lastDateSelected = this.selection.selectionDay;
